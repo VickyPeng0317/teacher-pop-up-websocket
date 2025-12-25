@@ -43,7 +43,9 @@
     <div id="status" class="bg-red-600 text-center text-xs py-1">離線中</div>
 
     <script>
-        const ws = new WebSocket('ws://localhost:8080');
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = protocol + '//' + window.location.host;
+        const ws = new WebSocket(wsUrl);
         const statusDiv = document.getElementById('status');
         const input = document.getElementById('msg-input');
 
