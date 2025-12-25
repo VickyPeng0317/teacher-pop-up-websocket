@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>觀眾席 - 發送心情</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white h-screen flex flex-col">
+
+    <div class="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
+        
+        <!-- 標題 -->
+        <div class="text-center">
+            <h1 class="text-2xl font-bold text-blue-400">互動發送區</h1>
+            <p class="text-gray-400 text-sm">點擊表情或輸入文字</p>
+        </div>
+
+        <!-- 快速表情區 -->
+        <div class="grid grid-cols-4 gap-4 w-full max-w-sm">
+            <button onclick="sendEmoji('👏')" class="text-4xl bg-gray-800 hover:bg-gray-700 p-4 rounded-xl transition transform active:scale-95 shadow-lg">👏</button>
+            <button onclick="sendEmoji('❤️')" class="text-4xl bg-gray-800 hover:bg-gray-700 p-4 rounded-xl transition transform active:scale-95 shadow-lg">❤️</button>
+            <button onclick="sendEmoji('😂')" class="text-4xl bg-gray-800 hover:bg-gray-700 p-4 rounded-xl transition transform active:scale-95 shadow-lg">😂</button>
+            <button onclick="sendEmoji('😲')" class="text-4xl bg-gray-800 hover:bg-gray-700 p-4 rounded-xl transition transform active:scale-95 shadow-lg">😲</button>
+            <button onclick="sendEmoji('👍')" class="text-4xl bg-gray-800 hover:bg-gray-700 p-4 rounded-xl transition transform active:scale-95 shadow-lg">👍</button>
+            <button onclick="sendEmoji('🎉')" class="text-4xl bg-gray-800 hover:bg-gray-700 p-4 rounded-xl transition transform active:scale-95 shadow-lg">🎉</button>
+            <button onclick="sendEmoji('🤔')" class="text-4xl bg-gray-800 hover:bg-gray-700 p-4 rounded-xl transition transform active:scale-95 shadow-lg">🤔</button>
+            <button onclick="sendEmoji('🔥')" class="text-4xl bg-gray-800 hover:bg-gray-700 p-4 rounded-xl transition transform active:scale-95 shadow-lg">🔥</button>
+        </div>
+
+        <!-- 文字輸入區 -->
+        <div class="w-full max-w-sm flex gap-2">
+            <input type="text" id="msg-input" placeholder="輸入留言..." maxlength="20"
+                class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 text-white">
+            <button onclick="sendText()" 
+                class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg transition transform active:scale-95">
+                送出
+            </button>
+        </div>
+    </div>
+
+    <!-- 連線狀態 -->
+    <div id="status" class="bg-red-600 text-center text-xs py-1">離線中</div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:8080');
+        const statusDiv = document.getElementById('status');
+        const input = document.getElementById('msg-input');
+
+        ws.onopen = () => {
+            statusDiv.textContent = '🟢 已連線';
+            statusDiv.classList.remove('bg-red-600');
+            statusDiv.classList.add('bg-green-600');
+        };
+
+        ws.onclose = () => {
+            statusDiv.textContent = '🔴 連線中斷';
+            statusDiv.classList.remove('bg-green-600');
+            statusDiv.classList.add('bg-red-600');
+        };
+
+        function send(data) {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(data));
+            }
+        }
+
+        function sendEmoji(emoji) {
+            send({ type: 'emoji', content: emoji });
+            // 觸發一點震動回饋 (手機端)
+            if(navigator.vibrate) navigator.vibrate(50);
+        }
+
+        function sendText() {
+            const text = input.value.trim();
+            if (text) {
+                send({ type: 'text', content: text });
+                input.value = '';
+            }
+        }
+
+        // Enter 鍵發送
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendText();
+        });
+    </script>
+</body>
+</html>

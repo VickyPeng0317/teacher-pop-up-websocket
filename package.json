@@ -1,0 +1,16 @@
+{
+  "name": "teacher-pop-up-websocket",
+  "version": "1.0.0",
+  "description": "簡報互動系統 - WebSocket 伺服器",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.18.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
